@@ -7,6 +7,7 @@ export declare class Ticket {
     holder?: string;
     reservationExpiresAt?: Date;
     ticketToken?: string;
+    qrImage?: string;
 }
 export declare const TicketSchema: import("mongoose").Schema<Ticket, import("mongoose").Model<Ticket, any, any, any, Document<unknown, any, Ticket, any, {}> & Ticket & {
     _id: Types.ObjectId;

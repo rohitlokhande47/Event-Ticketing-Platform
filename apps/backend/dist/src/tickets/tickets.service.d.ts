@@ -20,5 +20,6 @@ export declare class TicketsService {
         seatNumber: any;
         status: any;
         ticketToken: any;
+        qrImage: any;
     }[]>;
 }

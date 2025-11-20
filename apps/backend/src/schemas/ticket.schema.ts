@@ -22,6 +22,9 @@ export class Ticket {
 
   @Prop()
   ticketToken?: string;
+
+  @Prop()
+  qrImage?: string;
 }
 
 export const TicketSchema = SchemaFactory.createForClass(Ticket);

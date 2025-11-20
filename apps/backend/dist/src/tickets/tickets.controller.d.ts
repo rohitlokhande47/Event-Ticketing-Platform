@@ -21,5 +21,6 @@ export declare class TicketsController {
         seatNumber: any;
         status: any;
         ticketToken: any;
+        qrImage: any;
     }[]>;
 }

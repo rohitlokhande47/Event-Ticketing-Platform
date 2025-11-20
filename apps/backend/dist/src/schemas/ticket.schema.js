@@ -39,6 +39,10 @@ __decorate([
     (0, mongoose_1.Prop)(),
     __metadata("design:type", String)
 ], Ticket.prototype, "ticketToken", void 0);
+__decorate([
+    (0, mongoose_1.Prop)(),
+    __metadata("design:type", String)
+], Ticket.prototype, "qrImage", void 0);
 exports.Ticket = Ticket = __decorate([
     (0, mongoose_1.Schema)({ timestamps: true })
 ], Ticket);

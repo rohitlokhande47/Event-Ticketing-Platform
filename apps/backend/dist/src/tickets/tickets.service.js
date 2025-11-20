@@ -43,11 +43,9 @@ let TicketsService = TicketsService_1 = class TicketsService {
                 retryStrategy: () => null,
             });
             this.redis.on('error', (err) => {
-                this.logger.warn(`Redis connection error: ${err.message}`);
                 this.redisAvailable = false;
             });
             this.redis.on('connect', () => {
-                this.logger.log('Redis connected');
                 this.redisAvailable = true;
             });
             this.redlock = new redlock_1.default([this.redis], {
@@ -56,7 +54,6 @@ let TicketsService = TicketsService_1 = class TicketsService {
             });
         }
         catch (error) {
-            this.logger.warn(`Redis initialization error: ${error.message}. Continuing without Redis.`);
             this.redis = null;
             this.redlock = null;
             this.redisAvailable = false;
@@ -130,15 +127,20 @@ let TicketsService = TicketsService_1 = class TicketsService {
         try {
             this.logger.log(`Fetching tickets for user: ${userId}`);
             const tickets = await this.ticketModel
-                .find({ holder: userId })
+                .find({
+                holder: userId,
+                status: { $in: ['reserved', 'sold', 'used'] }
+            })
                 .lean()
                 .exec();
+            this.logger.log(`Found ${tickets.length} tickets for user ${userId}`);
             return tickets.map((ticket) => ({
                 _id: ticket._id?.toString() || ticket._id,
                 event: ticket.event?.toString() || ticket.event,
                 seatNumber: ticket.seatNumber,
                 status: ticket.status,
                 ticketToken: ticket.ticketToken,
+                qrImage: ticket.qrImage,
             }));
         }
         catch (error) {

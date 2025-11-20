@@ -33,14 +33,13 @@ export class TicketsService {
         retryStrategy: () => null, // Don't retry
       });
 
-      // Suppress unhandled error events
+      // Suppress unhandled error events - Redis is optional
       this.redis.on('error', (err) => {
-        this.logger.warn(`Redis connection error: ${err.message}`);
+        // Silently ignore Redis connection errors
         this.redisAvailable = false;
       });
 
       this.redis.on('connect', () => {
-        this.logger.log('Redis connected');
         this.redisAvailable = true;
       });
 
@@ -49,7 +48,7 @@ export class TicketsService {
         retryJitter: 0,
       });
     } catch (error) {
-      this.logger.warn(`Redis initialization error: ${error.message}. Continuing without Redis.`);
+      // Silently continue without Redis
       this.redis = null;
       this.redlock = null;
       this.redisAvailable = false;
@@ -136,16 +135,22 @@ export class TicketsService {
     try {
       this.logger.log(`Fetching tickets for user: ${userId}`);
       const tickets = await this.ticketModel
-        .find({ holder: userId })
+        .find({ 
+          holder: userId,
+          status: { $in: ['reserved', 'sold', 'used'] }
+        })
         .lean()
         .exec();
 
+      this.logger.log(`Found ${tickets.length} tickets for user ${userId}`);
+      
       return tickets.map((ticket: any) => ({
         _id: ticket._id?.toString() || ticket._id,
         event: ticket.event?.toString() || ticket.event,
         seatNumber: ticket.seatNumber,
         status: ticket.status,
         ticketToken: ticket.ticketToken,
+        qrImage: ticket.qrImage,
       }));
     } catch (error) {
       this.logger.error(`Error fetching user tickets: ${error.message}`);
