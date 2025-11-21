@@ -30,8 +30,13 @@ let TicketsService = TicketsService_1 = class TicketsService {
         this.initializeRedis();
     }
     initializeRedis() {
+        if (!process.env.REDIS_URL) {
+            this.logger.log('Redis not configured - using simple reservation mode');
+            this.redisAvailable = false;
+            return;
+        }
         try {
-            const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+            const redisUrl = process.env.REDIS_URL;
             const isTls = process.env.REDIS_TLS === 'true';
             this.redis = new ioredis_1.default(redisUrl, {
                 tls: isTls ? {} : undefined,
@@ -42,11 +47,12 @@ let TicketsService = TicketsService_1 = class TicketsService {
                 connectTimeout: 5000,
                 retryStrategy: () => null,
             });
-            this.redis.on('error', (err) => {
+            this.redis.on('error', () => {
                 this.redisAvailable = false;
             });
             this.redis.on('connect', () => {
                 this.redisAvailable = true;
+                this.logger.log('Redis connected successfully');
             });
             this.redlock = new redlock_1.default([this.redis], {
                 retryCount: 0,

@@ -16,6 +16,7 @@ const tickets_module_1 = require("./tickets/tickets.module");
 const payments_module_1 = require("./payments/payments.module");
 const qr_module_1 = require("./qr/qr.module");
 const events_module_1 = require("./events/events.module");
+const auth_module_1 = require("./auth/auth.module");
 let AppModule = class AppModule {
 };
 exports.AppModule = AppModule;
@@ -27,6 +28,7 @@ exports.AppModule = AppModule = __decorate([
                 envFilePath: '.env',
             }),
             mongoose_1.MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/ticketing'),
+            auth_module_1.AuthModule,
             tickets_module_1.TicketsModule,
             payments_module_1.PaymentsModule,
             qr_module_1.QrModule,
