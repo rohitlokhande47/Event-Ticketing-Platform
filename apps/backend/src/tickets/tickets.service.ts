@@ -19,8 +19,15 @@ export class TicketsService {
   }
 
   private initializeRedis() {
+    // Skip Redis initialization if REDIS_URL is not provided
+    if (!process.env.REDIS_URL) {
+      this.logger.log('Redis not configured - using simple reservation mode');
+      this.redisAvailable = false;
+      return;
+    }
+
     try {
-      const redisUrl = process.env.REDIS_URL || 'redis://localhost:6379';
+      const redisUrl = process.env.REDIS_URL;
       const isTls = process.env.REDIS_TLS === 'true';
       
       this.redis = new Redis(redisUrl, {
@@ -34,13 +41,14 @@ export class TicketsService {
       });
 
       // Suppress unhandled error events - Redis is optional
-      this.redis.on('error', (err) => {
+      this.redis.on('error', () => {
         // Silently ignore Redis connection errors
         this.redisAvailable = false;
       });
 
       this.redis.on('connect', () => {
         this.redisAvailable = true;
+        this.logger.log('Redis connected successfully');
       });
 
       this.redlock = new Redlock([this.redis], {
