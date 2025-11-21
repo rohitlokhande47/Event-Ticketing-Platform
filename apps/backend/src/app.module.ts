@@ -7,7 +7,6 @@ import { TicketsModule } from './tickets/tickets.module';
 import { PaymentsModule } from './payments/payments.module';
 import { QrModule } from './qr/qr.module';
 import { EventsModule } from './events/events.module';
-import { AuthModule } from './auth/auth.module';
 
 @Module({
   imports: [
@@ -16,7 +15,6 @@ import { AuthModule } from './auth/auth.module';
       envFilePath: '.env',
     }),
     MongooseModule.forRoot(process.env.MONGODB_URI || 'mongodb://localhost:27017/ticketing'),
-    AuthModule,
     TicketsModule,
     PaymentsModule,
     QrModule,
