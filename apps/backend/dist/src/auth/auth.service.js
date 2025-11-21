@@ -16,8 +16,8 @@ exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const mongoose_1 = require("@nestjs/mongoose");
 const mongoose_2 = require("mongoose");
-const bcryptjs_1 = require("bcryptjs");
-const jsonwebtoken_1 = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const jwt = require("jsonwebtoken");
 let AuthService = class AuthService {
     constructor(userModel) {
         this.userModel = userModel;
@@ -29,7 +29,7 @@ let AuthService = class AuthService {
         if (existingUser) {
             throw new Error('Email already registered');
         }
-        const hashedPassword = await bcryptjs_1.default.hash(password, 10);
+        const hashedPassword = await bcrypt.hash(password, 10);
         const user = new this.userModel({
             name: name.trim(),
             email: email.toLowerCase(),
@@ -38,7 +38,7 @@ let AuthService = class AuthService {
             updatedAt: new Date(),
         });
         const savedUser = await user.save();
-        const token = jsonwebtoken_1.default.sign({
+        const token = jwt.sign({
             id: savedUser._id.toString(),
             email: savedUser.email,
             name: savedUser.name,
@@ -59,11 +59,11 @@ let AuthService = class AuthService {
         if (!user) {
             throw new Error('Invalid email or password');
         }
-        const isPasswordValid = await bcryptjs_1.default.compare(password, user.password);
+        const isPasswordValid = await bcrypt.compare(password, user.password);
         if (!isPasswordValid) {
             throw new Error('Invalid email or password');
         }
-        const token = jsonwebtoken_1.default.sign({
+        const token = jwt.sign({
             id: user._id.toString(),
             email: user.email,
             name: user.name,
